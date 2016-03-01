@@ -1,0 +1,35 @@
+{% ckan_extends %}
+
+
+
+{% block primary_content %}
+  <section class="module">
+    <div class="module-content">
+	<h1 class="page-heading">
+		{% block page_heading %}
+			{{ _('Login') }}
+		{% endblock %}
+	</h1>
+
+      <fieldset>
+        <legend><h4>Autenticazione con Google</h4></legend>
+	<div id="g-signin-button"> 
+      		<span class="icon"></span>
+      		<span class="button-text">Google</span>
+	</div>
+      </fieldset>
+
+
+      <br><br>
+      <fieldset>
+        <legend>
+        <h4>Autenticazione tramite le credenziali di {{ app_globals.site_title}}</h4> 
+        </legend>
+        {% block form %}
+          {% snippet "user/snippets/login_form.html", action=c.login_handler, error_summary=error_summary %}
+        {% endblock %}
+      </fieldset>
+    </div>
+  </section>
+{% endblock %}
+
