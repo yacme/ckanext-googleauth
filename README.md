@@ -43,7 +43,7 @@ To install ckanext-googleauth for development, activate your CKAN virtualenv and
 This extension is licensed under the terms of GNU AFFERO GENERAL PUBLIC LICENSE Version 3.
 
 ##Credits
-This extension was deleveloped with the support of ARPA Emilia Romagna.
+This extension was developed with the support of ARPA Emilia Romagna.
 
 
 
