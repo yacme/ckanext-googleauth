@@ -17,7 +17,7 @@ To use this extension you must register your application with Google to obtainin
 
 To install ckanext-googleauth:
 
-1. Download the package ckanext-googleauth.zip and uncompress it in /usr/lib/ckan/default/src.
+1. Download ckanext-googleauth.zip from here (https://github.com/yacme/ckanext-googleauth/releases/download/1.0.0/ckanext-googleauth.zip) and uncompress it in /usr/lib/ckan/default/src.
 
 2. Entry into /usr/lib/ckan/default/src/ckanext-googleauth.
 
