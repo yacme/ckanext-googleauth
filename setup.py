@@ -17,15 +17,15 @@ setup(
     # http://packaging.python.org/en/latest/tutorial.html#version
     version='0.0.1',
 
-    description='''Authentication with Google''',
+    description='''CKAN extension for use Google as authentication authority''',
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com//ckanext-googleauth',
+    url='https://github.com/yacme/ckanext-googleauth',
 
     # Author details
-    author='''Andrea Stella - Yacme S.r.l. - Gruppo MakeIT''',
-    author_email='''andrea.stella@yacme.com''',
+    author='''Yacme S.r.l.''',
+    author_email='''dev@yacme.com''',
 
     # Choose your license
     license='AGPL',
@@ -39,7 +39,7 @@ setup(
         'Development Status :: 4 - Beta',
 
         # Pick your license as you wish (should match "license" above)
-        'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
+        'License :: OSI Approved :: GNU Affero General Public License v3',
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.

@@ -1,4 +1,4 @@
-"""This program is free software: you can redistribute it and/or modify
+'''This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
  Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
  Everyone is permitted to copy and distribute verbatim copies
- of this license document, but changing it is not allowed."""
+ of this license document, but changing it is not allowed.'''
 
 
 
@@ -35,7 +35,7 @@ import re
 
 #get 'ckan.googleauth_clientid' from ini file
 def get_clientid():
-    return config.get('ckan.googleauth_clientid', False)
+    return config.get('ckan.googleauth_clientid', '')
 
 
 #get ckan.googleauth_hosted_domain from ini file

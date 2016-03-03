@@ -2,9 +2,14 @@
 
 CKAN extension for use Google as authentication authority.
 
+This extension allow users to authenticate in CKAN using their google account. Optionally, it's possible to filter users by google domain.
+
+At the first access, the extension create a new user in CKAN with strong and complex password and username calculated from email address, substituting every non alphanumerical character with underscore "_".
+For example: 'name.surname@domain.it' -> 'name_surname_domain_it'.
+
 ##Requirements
 
-ckanext-googleauth was created and tested in CKAN 2.5.1. The functioning with other versions of CKAN is not guaranteed.
+ckanext-googleauth was created and tested in CKAN 2.5.1; it was also tested in CKAN 2.4.1. The functioning with other versions of CKAN is not guaranteed.
 
 To use this extension you must register your application with Google to obtaining authorization credentials. For more information please visit https://developers.google.com/identity/sign-in/web/devconsole-project 
 
@@ -12,16 +17,20 @@ To use this extension you must register your application with Google to obtainin
 
 To install ckanext-googleauth:
 
-1. Clone this repository and run:	
+1. Download the package ckanext-googleauth.zip and uncompress it in /usr/lib/ckan/default/src.
+
+2. Entry into /usr/lib/ckan/default/src/ckanext-googleauth.
+
+3. Execute:
 
     <code>python setup.py install</code>
 
-2. Configure Client ID and (optionally) Hosted Domain (See "Config Settings" section)
+4. Configure Client ID and (optionally) Hosted Domain (See "Config Settings" section)
 
-3. Add ``googleauth`` to the ``ckan.plugins`` setting in your CKAN config file (by default the config file is located at
+5. Add ``googleauth`` to the ``ckan.plugins`` setting in your CKAN config file (by default the config file is located at
    ``/etc/ckan/default/production.ini``).
 
-4. Restart CKAN.
+6. Restart CKAN.
 
 ##Config Settings
 
