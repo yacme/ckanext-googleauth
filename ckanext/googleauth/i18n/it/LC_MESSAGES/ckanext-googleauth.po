@@ -20,7 +20,7 @@ msgstr ""
 
 #: ckanext/googleauth/templates/user/login.html:10
 msgid "Log in"
-msgstr ""
+msgstr "Accedi"
 
 #: ckanext/googleauth/templates/user/login.html:15
 msgid "Log in with Google"
