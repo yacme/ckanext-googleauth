@@ -21,6 +21,7 @@
 
 
 {% block scripts %}
+    {{ super() }}
     <script src="https://apis.google.com/js/api:client.js"></script>
     <script type="text/javascript" src="/base/js/googleauth.js"></script>
     <script>startApp();</script>

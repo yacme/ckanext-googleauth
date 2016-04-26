@@ -27,27 +27,29 @@ var startApp = function() {
     auth2 = gapi.auth2.init({
       client_id: cid,
       cookiepolicy: 'single_host_origin',
-      hosted_domain: hd,
+      hosted_domain: hd
     });
-    attachSignin(document.getElementById('g-signin-button'));
+    var button = document.getElementById('g-signin-button');
+    if (button) {
+        attachSignin(button);
+    }
   });
 };
 
 
 
 function attachSignin(element) {
-  console.log(element.id);
   auth2.attachClickHandler(element, {},
       function(googleUser) {
 
         var profile = googleUser.getBasicProfile();
         var name = profile.getName();
         var email = profile.getEmail();
-	
+
 	var response = googleUser.getAuthResponse();
 	var id_token = response['id_token'];
 	var access_token = response['access_token'];
-	
+
 	$.ajax({
 	type: 'POST',
        	url:'/user/login',
@@ -69,7 +71,7 @@ function attachSignin(element) {
 
 
 
-/*get content from meta tag*/ 
+/*get content from meta tag*/
 function getMetaContent(propName) {
   var metas = document.getElementsByTagName('meta');
   for (i = 0; i < metas.length; i++) {
@@ -79,11 +81,3 @@ function getMetaContent(propName) {
   }
   return "";
 }
-
-
-
-
-
-
-
-
