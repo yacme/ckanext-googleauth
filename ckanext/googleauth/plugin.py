@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # coding=utf-8
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+from ckan.lib.plugins import DefaultTranslation
 import json
 import uuid
 import pylons
@@ -48,11 +49,11 @@ class GoogleAuthException(Exception):
 
 
 
-class GoogleauthPlugin(plugins.SingletonPlugin):
+class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IAuthenticator)
     plugins.implements(plugins.ITemplateHelpers)
-
+    plugins.implements(plugins.ITranslation)
 
 
     def update_config(self, config_):
@@ -169,7 +170,7 @@ class GoogleauthPlugin(plugins.SingletonPlugin):
 
 
     def logout(self):
-	self._logout_user()
+        self._logout_user()
 
     def abort(self, status_code=None, detail='', headers=None, comment=None):
         self._logout_user()
