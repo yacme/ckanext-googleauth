@@ -170,9 +170,9 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
 
 
     def logout(self):
-	self._logout_user()
+        self._logout_user()
 
+    def abort(self, status_code=None, detail='', headers=None, comment=None):
+        self._logout_user()
 
-
-    def abort(self):
-	self._logout_user()
+        return (status_code, detail, headers, comment)
