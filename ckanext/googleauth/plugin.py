@@ -1,25 +1,3 @@
-'''This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-                    GNU AFFERO GENERAL PUBLIC LICENSE
-                       Version 3, 19 November 2007
-
- Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
- Everyone is permitted to copy and distribute verbatim copies
- of this license document, but changing it is not allowed.'''
-
-
-
 # coding=utf-8
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
@@ -114,12 +92,12 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     #generates a strong password
     def get_ckanpasswd(self):
-	import datetime
-	import random
+        import datetime
+        import random
 
-	passwd = str(random.random())+ datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")+str(uuid.uuid4().hex)
-	passwd = re.sub(r"\s+", "", passwd, flags=re.UNICODE)
-	return passwd
+        passwd = str(random.random())+ datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")+str(uuid.uuid4().hex)
+        passwd = re.sub(r"\s+", "", passwd, flags=re.UNICODE)
+        return passwd
 
 
 
@@ -148,35 +126,35 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     	params = toolkit.request.params
 
-	if 'id_token' in params:
-		try:
-			mail_verified = self.verify_email(params['id_token'])
-		except GoogleAuthException, e:
-			toolkit.abort(500)
+        if 'id_token' in params:
+            try:
+                mail_verified = self.verify_email(params['id_token'])
+            except GoogleAuthException, e:
+                toolkit.abort(500)
 
-		user_account = email_to_ckan_user(mail_verified)
+            user_account = email_to_ckan_user(mail_verified)
 
-		user_ckan = self.get_ckanuser(user_account)
+            user_ckan = self.get_ckanuser(user_account)
 
-		if not user_ckan:
-			user_ckan = toolkit.get_action('user_create')(
-                    				context={'ignore_auth': True},
-                    				data_dict={'email': mail_verified,
-                               			'name': user_account,
-                               			'password': self.get_ckanpasswd()})
+            if not user_ckan:
+                user_ckan = toolkit.get_action('user_create')(
+                                        context={'ignore_auth': True},
+                                        data_dict={'email': mail_verified,
+                                            'name': user_account,
+                                            'password': self.get_ckanpasswd()})
 
-		pylons.session['ckanext-google-user'] = user_ckan['name']
-        	pylons.session['ckanext-google-email'] = mail_verified
+            pylons.session['ckanext-google-user'] = user_ckan['name']
+            pylons.session['ckanext-google-email'] = mail_verified
 
-		#to revoke the Google token uncomment the code below
-		#pylons.session['ckanext-google-accesstoken'] = params['token']
-            	pylons.session.save()
+            #to revoke the Google token uncomment the code below
+            #pylons.session['ckanext-google-accesstoken'] = params['token']
+            pylons.session.save()
 
 
 
     #if someone is logged in will be set the parameter c.user
     def identify(self):
-	user_ckan = pylons.session.get('ckanext-google-user')
+        user_ckan = pylons.session.get('ckanext-google-user')
         if user_ckan:
             toolkit.c.user = user_ckan
 
@@ -186,6 +164,8 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
         self._logout_user()
 
     def abort(self, status_code=None, detail='', headers=None, comment=None):
+        if status_code == 403 or status_code == 404:
+            return (status_code, detail, headers, comment)
         self._logout_user()
 
         return (status_code, detail, headers, comment)
