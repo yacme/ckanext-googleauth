@@ -65,14 +65,14 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
         res = requests.post('https://www.googleapis.com/oauth2/v3/tokeninfo?id_token='+token, verify=True)
 
         if res.ok:
-                is_email_verified=json.loads(res.content)
-                if is_email_verified['email_verified'] == 'true':
-                        email_verified = is_email_verified['email']
-                        return email_verified
-                else:
-                        raise GoogleAuthException(is_email_verified)
+            is_email_verified=json.loads(res.content)
+            if is_email_verified['email_verified'] == 'true':
+                    email_verified = is_email_verified['email']
+                    return email_verified
+            else:
+                    raise GoogleAuthException(is_email_verified)
         else:
-                raise GoogleAuthException(res)
+            raise GoogleAuthException(res)
 
 
 
@@ -80,13 +80,13 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
     def get_ckanuser(self, user):
     	import ckan.model
 
-	user_ckan = ckan.model.User.by_name(user)
+        user_ckan = ckan.model.User.by_name(user)
 
-	if user_ckan:
-		user_dict = toolkit.get_action('user_show')(data_dict={'id': user_ckan.id})
-		return user_dict
-	else:
-		return None
+        if user_ckan:
+            user_dict = toolkit.get_action('user_show')(data_dict={'id': user_ckan.id})
+            return user_dict
+        else:
+            return None
 
 
 
