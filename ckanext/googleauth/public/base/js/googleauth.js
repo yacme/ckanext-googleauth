@@ -23,6 +23,9 @@ var googleUser = {};
 var cid = getMetaContent('google-signin-client_id');
 var hd = getMetaContent('google-signin-hosted_domain');
 var startApp = function() {
+    // https://developers.google.com/identity/gsi/web/guides/migration#identifying_affected_code_and_testing
+    // Values include 'informational' and 'enforced'
+    document.cookie = "G_AUTH2_MIGRATION=informational";
   gapi.load('auth2', function(){
     auth2 = gapi.auth2.init({
       client_id: cid,
