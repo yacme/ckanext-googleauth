@@ -14,7 +14,7 @@
       <fieldset>
         <legend><h4>{{ _('Log in with Google') }}</h4></legend>
         {% set ci=h.googleauth_get_clientid() %}
-        {% comment %}data-login_uri omitted for POST to same page{% endcomment %}
+        {# data-login_uri omitted for POST to same page #}
 	    <div id="g_id_onload" data-client_id="{{ ci }}">
         </div>
         <div class="g_id_signin" data-type="standard"></div>
