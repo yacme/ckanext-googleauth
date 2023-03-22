@@ -4,6 +4,9 @@ import ckan.plugins.toolkit as toolkit
 from ckan.lib.plugins import DefaultTranslation
 import json
 import uuid
+
+from google.oauth2 import id_token
+from google.auth.transport import requests
 import pylons
 import pylons.config as config
 import ckan.lib.helpers as helpers
@@ -50,29 +53,12 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
     def update_config(self, config_):
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
-        toolkit.add_resource('fanstatic', 'googleauth')
 
 
     #declare new helper functions
     def get_helpers(self):
         return {'googleauth_get_clientid': get_clientid,
 		'googleauth_get_hosted_domain': get_hosted_domain}
-
-
-
-    #verify email address within token
-    def verify_email(self, token):
-        res = requests.post('https://www.googleapis.com/oauth2/v3/tokeninfo?id_token='+token, verify=True)
-
-        if res.ok:
-            is_email_verified=json.loads(res.content)
-            if is_email_verified['email_verified'] == 'true':
-                    email_verified = is_email_verified['email']
-                    return email_verified
-            else:
-                    raise GoogleAuthException(is_email_verified)
-        else:
-            raise GoogleAuthException(res)
 
 
 
@@ -126,31 +112,33 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     	params = toolkit.request.params
 
-        if 'id_token' in params:
-            try:
-                mail_verified = self.verify_email(params['id_token'])
-            except GoogleAuthException, e:
+        if 'credential' in params:
+            # https://developers.google.com/identity/gsi/web/reference/js-reference#CredentialResponse
+            # https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
+            id_info = id_token.verify_oauth2_token(
+                token, requests.Request(), get_clientid()
+            )
+            if id_info.get('hd', '') != get_hosted_domain():
                 toolkit.abort(500)
 
-            user_account = email_to_ckan_user(mail_verified)
+            email = id_info['email']
+            user_account = email_to_ckan_user(email)
 
-            user_ckan = self.get_ckanuser(user_account)
+            user_ckan = self.get_ckanuser(email)
 
             if not user_ckan:
                 user_ckan = toolkit.get_action('user_create')(
                                         context={'ignore_auth': True},
-                                        data_dict={'email': mail_verified,
+                                        data_dict={'email': email,
                                             'name': user_account,
                                             'password': self.get_ckanpasswd()})
 
             pylons.session['ckanext-google-user'] = user_ckan['name']
-            pylons.session['ckanext-google-email'] = mail_verified
+            pylons.session['ckanext-google-email'] = email
 
             #to revoke the Google token uncomment the code below
             #pylons.session['ckanext-google-accesstoken'] = params['token']
             pylons.session.save()
-
-
 
     #if someone is logged in will be set the parameter c.user
     def identify(self):

@@ -9,20 +9,12 @@
 {% endblock %}
 
 
-{% block meta %}
-{% set ci=h.googleauth_get_clientid() %}
-{% set hd=h.googleauth_get_hosted_domain() %}
-  {{ super() }}
-    <meta name="google-signin-scope" content="profile email">
-    <meta name="google-signin-client_id" content="{{ ci }}">
-    <meta name="google-signin-hosted_domain" content="{{ hd }}">
-{% endblock %}
-
-
-
 {% block scripts %}
     {{ super() }}
-    <script src="https://apis.google.com/js/api:client.js"></script>
-    <script type="text/javascript" src="/base/js/googleauth.js"></script>
-    <script>startApp();</script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script type="text/javascript">
+    // https://developers.google.com/identity/gsi/web/guides/migration#identifying_affected_code_and_testing
+    // Values include 'informational' and 'enforced'
+    document.cookie = "G_AUTH2_MIGRATION=informational";
+    </script>
 {% endblock %}
