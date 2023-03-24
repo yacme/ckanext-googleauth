@@ -122,7 +122,7 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
             # https://developers.google.com/identity/gsi/web/reference/js-reference#CredentialResponse
             # https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
             id_info = id_token.verify_oauth2_token(
-                token, requests.Request(), get_clientid()
+                params['credential'], requests.Request(), get_clientid()
             )
             if id_info.get('hd', '') != get_hosted_domain():
                 toolkit.abort(500)
