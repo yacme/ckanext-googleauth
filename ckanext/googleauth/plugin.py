@@ -129,7 +129,7 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
             email = id_info['email']
             user_account = email_to_ckan_user(email)
 
-            user_ckan = self.get_ckanuser(email)
+            user_ckan = self.get_ckanuser(user_account)
 
             if not user_ckan:
                 user_ckan = toolkit.get_action('user_create')(
