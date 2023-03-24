@@ -10,7 +10,6 @@ from google.auth.transport import requests
 import pylons
 import pylons.config as config
 import ckan.lib.helpers as helpers
-import requests
 import re
 
 
