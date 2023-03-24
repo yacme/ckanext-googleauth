@@ -20,6 +20,11 @@ def get_clientid():
     return config.get('ckan.googleauth_clientid', '')
 
 
+def get_loginuri():
+    site_url = config.get('ckan.site_url')
+    return '%s/user/login' % (site_url)
+
+
 #get ckan.googleauth_hosted_domain from ini file
 def get_hosted_domain():
     return config.get('ckan.googleauth_hosted_domain', '')
@@ -58,6 +63,7 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
     #declare new helper functions
     def get_helpers(self):
         return {'googleauth_get_clientid': get_clientid,
+                'googleauth_get_loginuri': get_loginuri,
 		'googleauth_get_hosted_domain': get_hosted_domain}
 
 
