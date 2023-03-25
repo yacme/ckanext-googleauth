@@ -145,15 +145,13 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
             #pylons.session['ckanext-google-accesstoken'] = params['token']
             pylons.session.save()
 
+            h.redirect_to('/dashboard')
+
     #if someone is logged in will be set the parameter c.user
     def identify(self):
         user_ckan = pylons.session.get('ckanext-google-user')
         if user_ckan:
             toolkit.c.user = user_ckan
-
-            request = toolkit.request
-            if request.method == 'POST':
-                h.redirect_to('/dashboard')
 
     def logout(self):
         self._logout_user()
