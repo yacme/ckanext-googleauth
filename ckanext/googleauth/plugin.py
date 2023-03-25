@@ -9,7 +9,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 import pylons
 import pylons.config as config
-import ckan.lib.helpers as helpers
+import ckan.lib.helpers as h
 import re
 
 
@@ -151,7 +151,9 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
         if user_ckan:
             toolkit.c.user = user_ckan
 
-
+        request = toolkit.request
+        if request.method == 'POST':
+            h.redirect_to('/dashboard')
 
     def logout(self):
         self._logout_user()
