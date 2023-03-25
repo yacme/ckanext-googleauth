@@ -151,9 +151,9 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
         if user_ckan:
             toolkit.c.user = user_ckan
 
-        request = toolkit.request
-        if request.method == 'POST':
-            h.redirect_to('/dashboard')
+            request = toolkit.request
+            if request.method == 'POST':
+                h.redirect_to('/dashboard')
 
     def logout(self):
         self._logout_user()
