@@ -3,9 +3,4 @@
 {% block scripts %}
     {{ super() }}
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script type="text/javascript">
-    // https://developers.google.com/identity/gsi/web/guides/migration#identifying_affected_code_and_testing
-    // Values include 'informational' and 'enforced'
-    document.cookie = "G_AUTH2_MIGRATION=informational";
-    </script>
 {% endblock %}
