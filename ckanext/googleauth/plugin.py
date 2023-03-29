@@ -150,10 +150,15 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
 
             #to revoke the Google token uncomment the code below
             #pylons.session['ckanext-google-accesstoken'] = params['token']
+
+            log.debug('Saving pylons session... %r' % pylons.session)
             pylons.session.save()
 
+            log.debug('Session type: %s' % getattr(pylons.session, "type"))
+            log.debug('Session dir: %s' % getattr(pylons.session, "data_dir"))
+
             log.debug('Redirecting to dashboard')
-            # h.redirect_to('/dashboard')
+            h.redirect_to('/dashboard')
 
     #if someone is logged in will be set the parameter c.user
     def identify(self):
