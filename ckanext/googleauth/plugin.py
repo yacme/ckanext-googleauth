@@ -176,6 +176,10 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
         self._logout_user()
 
     def abort(self, status_code=None, detail='', headers=None, comment=None):
+        log.debug('abort() status_code=%s' % status_code)
+
+        log.debug('Pylons session... %r' % pylons.session)
+
         if status_code == 403 or status_code == 404:
             return (status_code, detail, headers, comment)
         self._logout_user()
