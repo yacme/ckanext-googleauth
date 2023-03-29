@@ -3,6 +3,7 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 from ckan.lib.plugins import DefaultTranslation
 import json
+import logging
 import uuid
 
 from google.oauth2 import id_token
@@ -12,7 +13,7 @@ import pylons.config as config
 import ckan.lib.helpers as h
 import re
 
-
+log = logging.getLogger(__name__)
 
 #get 'ckan.googleauth_clientid' from ini file
 def get_clientid():
@@ -113,24 +114,31 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     #at every access the email address is checked. if it is authorized ckan username is created and access is given
     def login(self):
+        log.debug('login()')
 
     	params = toolkit.request.params
 
         if 'credential' in params:
+            log.debug('credential in params')
             # https://developers.google.com/identity/gsi/web/reference/js-reference#CredentialResponse
             # https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
             id_info = id_token.verify_oauth2_token(
                 params['credential'], requests.Request(), get_clientid()
             )
             if id_info.get('hd', '') != get_hosted_domain():
+                log.debug('Hosted domain mismatch: aborting...')
                 toolkit.abort(500)
 
             email = id_info['email']
+            log.debug('Email address: %s' % email)
+
             user_account = email_to_ckan_user(email)
+            log.debug('User account: %s' % user_account)
 
             user_ckan = self.get_ckanuser(user_account)
 
             if not user_ckan:
+                log.debug('Creating CKAN user')
                 user_ckan = toolkit.get_action('user_create')(
                                         context={'ignore_auth': True},
                                         data_dict={'email': email,
@@ -144,6 +152,7 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
             #pylons.session['ckanext-google-accesstoken'] = params['token']
             pylons.session.save()
 
+            log.debug('Redirecting to dashboard')
             h.redirect_to('/dashboard')
 
     #if someone is logged in will be set the parameter c.user
