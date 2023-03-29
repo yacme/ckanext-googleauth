@@ -153,7 +153,7 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
             pylons.session.save()
 
             log.debug('Redirecting to dashboard')
-            h.redirect_to('/dashboard')
+            # h.redirect_to('/dashboard')
 
     #if someone is logged in will be set the parameter c.user
     def identify(self):
