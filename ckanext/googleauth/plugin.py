@@ -157,11 +157,14 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     #if someone is logged in will be set the parameter c.user
     def identify(self):
+        log.debug('identify()')
         user_ckan = pylons.session.get('ckanext-google-user')
+        log.debug('CKAN User: %s' % user_ckan)
         if user_ckan:
             toolkit.c.user = user_ckan
 
     def logout(self):
+        log.debug('logout()')
         self._logout_user()
 
     def abort(self, status_code=None, detail='', headers=None, comment=None):
