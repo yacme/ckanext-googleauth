@@ -154,9 +154,11 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
             log.debug('Saving pylons session... %r' % pylons.session)
             pylons.session.save()
 
-            log.debug('Session type: %s' % getattr(pylons.session, "type"))
-            log.debug('Session dir: %s' % getattr(pylons.session, "data_dir"))
-            log.debug('Session id: %s' % getattr(pylons.session, "id"))
+            log.debug('Session type: %s' % pylons.session.type)
+            log.debug('Session dir: %s' % pylons.session.data_dir)
+            log.debug('Session id: %s' % pylons.session.id)
+            log.debug('Session use_cookies: %s' % pylons.session.use_cookies)
+            log.debug('Session timeout: %s' % pylons.session.timeout)
 
             log.debug('Redirecting to dashboard')
             h.redirect_to('/dashboard')
@@ -166,6 +168,11 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
         log.debug('identify()')
 
         log.debug('Pylons session... %r' % pylons.session)
+        log.debug('Session type: %s' % pylons.session.type)
+        log.debug('Session dir: %s' % pylons.session.data_dir)
+        log.debug('Session id: %s' % pylons.session.id)
+        log.debug('Session use_cookies: %s' % pylons.session.use_cookies)
+        log.debug('Session timeout: %s' % pylons.session.timeout)
 
         user_ckan = pylons.session.get('ckanext-google-user')
         log.debug('CKAN User: %r' % user_ckan)
