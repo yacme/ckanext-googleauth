@@ -1,42 +1,28 @@
-'''This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-                    GNU AFFERO GENERAL PUBLIC LICENSE
-                       Version 3, 19 November 2007
-
- Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
- Everyone is permitted to copy and distribute verbatim copies
- of this license document, but changing it is not allowed.'''
-
-
-
 # coding=utf-8
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 from ckan.lib.plugins import DefaultTranslation
 import json
+import logging
 import uuid
+
+from google.oauth2 import id_token
+from google.auth.transport import requests
 import pylons
 import pylons.config as config
-import ckan.lib.helpers as helpers
-import requests
+import ckan.lib.helpers as h
 import re
 
-
+log = logging.getLogger(__name__)
 
 #get 'ckan.googleauth_clientid' from ini file
 def get_clientid():
     return config.get('ckan.googleauth_clientid', '')
+
+
+def get_loginuri():
+    site_url = config.get('ckan.site_url')
+    return '%s/user/login' % (site_url)
 
 
 #get ckan.googleauth_hosted_domain from ini file
@@ -71,30 +57,13 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     def update_config(self, config_):
         toolkit.add_template_directory(config_, 'templates')
-        toolkit.add_public_directory(config_, 'public')
-        toolkit.add_resource('fanstatic', 'googleauth')
 
 
     #declare new helper functions
     def get_helpers(self):
         return {'googleauth_get_clientid': get_clientid,
+                'googleauth_get_loginuri': get_loginuri,
 		'googleauth_get_hosted_domain': get_hosted_domain}
-
-
-
-    #verify email address within token
-    def verify_email(self, token):
-        res = requests.post('https://www.googleapis.com/oauth2/v3/tokeninfo?id_token='+token, verify=True)
-
-        if res.ok:
-                is_email_verified=json.loads(res.content)
-                if is_email_verified['email_verified'] == 'true':
-                        email_verified = is_email_verified['email']
-                        return email_verified
-                else:
-                        raise GoogleAuthException(is_email_verified)
-        else:
-                raise GoogleAuthException(res)
 
 
 
@@ -102,24 +71,24 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
     def get_ckanuser(self, user):
     	import ckan.model
 
-	user_ckan = ckan.model.User.by_name(user)
+        user_ckan = ckan.model.User.by_name(user)
 
-	if user_ckan:
-		user_dict = toolkit.get_action('user_show')(data_dict={'id': user_ckan.id})
-		return user_dict
-	else:
-		return None
+        if user_ckan:
+            user_dict = toolkit.get_action('user_show')(data_dict={'id': user_ckan.id})
+            return user_dict
+        else:
+            return None
 
 
 
     #generates a strong password
     def get_ckanpasswd(self):
-	import datetime
-	import random
+        import datetime
+        import random
 
-	passwd = str(random.random())+ datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")+str(uuid.uuid4().hex)
-	passwd = re.sub(r"\s+", "", passwd, flags=re.UNICODE)
-	return passwd
+        passwd = str(random.random())+ datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")+str(uuid.uuid4().hex)
+        passwd = re.sub(r"\s+", "", passwd, flags=re.UNICODE)
+        return passwd
 
 
 
@@ -145,47 +114,74 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     #at every access the email address is checked. if it is authorized ckan username is created and access is given
     def login(self):
+        log.debug('login()')
 
     	params = toolkit.request.params
 
-	if 'id_token' in params:
-		try:
-			mail_verified = self.verify_email(params['id_token'])
-		except GoogleAuthException, e:
-			toolkit.abort(500)
+        if 'credential' in params:
+            log.debug('credential in params')
+            # https://developers.google.com/identity/gsi/web/reference/js-reference#CredentialResponse
+            # https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
+            id_info = id_token.verify_oauth2_token(
+                params['credential'], requests.Request(), get_clientid()
+            )
+            if id_info.get('hd', '') != get_hosted_domain():
+                log.debug('Hosted domain mismatch: aborting...')
+                toolkit.abort(500)
 
-		user_account = email_to_ckan_user(mail_verified)
+            email = id_info['email']
+            log.debug('Email address: %s' % email)
 
-		user_ckan = self.get_ckanuser(user_account)
+            user_account = email_to_ckan_user(email)
+            log.debug('User account: %s' % user_account)
 
-		if not user_ckan:
-			user_ckan = toolkit.get_action('user_create')(
-                    				context={'ignore_auth': True},
-                    				data_dict={'email': mail_verified,
-                               			'name': user_account,
-                               			'password': self.get_ckanpasswd()})
+            user_ckan = self.get_ckanuser(user_account)
 
-		pylons.session['ckanext-google-user'] = user_ckan['name']
-        	pylons.session['ckanext-google-email'] = mail_verified
+            if not user_ckan:
+                log.debug('Creating CKAN user')
+                user_ckan = toolkit.get_action('user_create')(
+                                        context={'ignore_auth': True},
+                                        data_dict={'email': email,
+                                            'name': user_account,
+                                            'password': self.get_ckanpasswd()})
 
-		#to revoke the Google token uncomment the code below
-		#pylons.session['ckanext-google-accesstoken'] = params['token']
-            	pylons.session.save()
+            pylons.session['ckanext-google-user'] = user_ckan['name']
+            pylons.session['ckanext-google-email'] = email
 
+            #to revoke the Google token uncomment the code below
+            #pylons.session['ckanext-google-accesstoken'] = params['token']
 
+            log.debug('Saving pylons session... %r' % pylons.session)
+            pylons.session.save()
+
+            log.debug('Session type: %s' % getattr(pylons.session, "type"))
+            log.debug('Session dir: %s' % getattr(pylons.session, "data_dir"))
+
+            log.debug('Redirecting to dashboard')
+            h.redirect_to('/dashboard')
 
     #if someone is logged in will be set the parameter c.user
     def identify(self):
-	user_ckan = pylons.session.get('ckanext-google-user')
+        log.debug('identify()')
+
+        log.debug('Pylons session... %r' % pylons.session)
+
+        user_ckan = pylons.session.get('ckanext-google-user')
+        log.debug('CKAN User: %s' % user_ckan)
         if user_ckan:
             toolkit.c.user = user_ckan
 
-
-
     def logout(self):
+        log.debug('logout()')
         self._logout_user()
 
     def abort(self, status_code=None, detail='', headers=None, comment=None):
+        log.debug('abort() status_code=%s' % status_code)
+
+        log.debug('Pylons session... %r' % pylons.session)
+
+        if status_code == 403 or status_code == 404:
+            return (status_code, detail, headers, comment)
         self._logout_user()
 
         return (status_code, detail, headers, comment)

@@ -1,28 +1,6 @@
 {% ckan_extends %}
 
-
-
-{% block styles %}
-    <link rel="stylesheet" type="text/css" href="/base/css/gbutton.css">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
-    {{ super() }}
-{% endblock %}
-
-
-{% block meta %}
-{% set ci=h.googleauth_get_clientid() %}
-{% set hd=h.googleauth_get_hosted_domain() %}
-  {{ super() }}
-    <meta name="google-signin-scope" content="profile email">
-    <meta name="google-signin-client_id" content="{{ ci }}">
-    <meta name="google-signin-hosted_domain" content="{{ hd }}">
-{% endblock %}
-
-
-
 {% block scripts %}
     {{ super() }}
-    <script src="https://apis.google.com/js/api:client.js"></script>
-    <script type="text/javascript" src="/base/js/googleauth.js"></script>
-    <script>startApp();</script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 {% endblock %}
