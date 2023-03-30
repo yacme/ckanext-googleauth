@@ -157,7 +157,6 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
             log.debug('Session type: %s' % getattr(pylons.session, "type"))
             log.debug('Session dir: %s' % getattr(pylons.session, "data_dir"))
             log.debug('Session id: %s' % getattr(pylons.session, "id"))
-            log.debug('Session namespace: %r' % getattr(pylons.session, "namespace"))
 
             log.debug('Redirecting to dashboard')
             h.redirect_to('/dashboard')
