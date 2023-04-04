@@ -108,6 +108,8 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
             del pylons.session['ckanext-google-user']
         if 'ckanext-google-email' in pylons.session:
             del pylons.session['ckanext-google-email']
+        if 'ckanext-google-foo' in pylons.session:
+            del pylons.session['ckanext-google-foo']
         pylons.session.save()
 
 
