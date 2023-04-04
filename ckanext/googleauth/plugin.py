@@ -116,6 +116,9 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
     def login(self):
         log.debug('login()')
 
+        pylons.session['ckanext-google-foo'] = 'bar'
+        pylons.session.save()
+
     	params = toolkit.request.params
 
         if 'credential' in params:
