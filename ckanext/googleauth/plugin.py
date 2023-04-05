@@ -118,8 +118,8 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
     def login(self):
         log.debug('login()')
 
-        pylons.session['ckanext-google-foo'] = 'bar'
-        pylons.session.save()
+        # pylons.session['ckanext-google-foo'] = 'bar'
+        # pylons.session.save()
 
     	params = toolkit.request.params
 
